@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
+	"go-sql-log/logger"
 	"go-sql-log/types"
 )
 
@@ -37,7 +38,7 @@ func Run() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to query")
 	}
-	log.Info().Any("list", list).Msg("list")
+	log.Info().Any("list", list).Msg("select")
 }
 
 type SQLXDBInterface interface {
@@ -54,21 +55,41 @@ type QueryLogger struct {
 var _ sqlx.Execer = (SQLXDBInterface)(nil)
 
 func (q *QueryLogger) Exec(query string, args ...interface{}) (sql.Result, error) {
-	q.logger.Info().Str("query", query).Any("args", args).Msg("exec")
+	q.logger.Info().Str("sql", logger.ExplainSQL(
+		query,
+		nil,
+		`'`,
+		args...,
+	)).Msg("exec")
 	return q.db.Exec(query, args...)
 }
 
 func (q *QueryLogger) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	q.logger.Info().Str("query", query).Any("args", args).Msg("query")
+	q.logger.Info().Str("sql", logger.ExplainSQL(
+		query,
+		nil,
+		`'`,
+		args...,
+	)).Msg("query")
 	return q.db.Query(query, args...)
 }
 
 func (q *QueryLogger) Queryx(query string, args ...interface{}) (*sqlx.Rows, error) {
-	q.logger.Info().Str("query", query).Any("args", args).Msg("queryx")
+	q.logger.Info().Str("sql", logger.ExplainSQL(
+		query,
+		nil,
+		`'`,
+		args...,
+	)).Msg("queryx")
 	return q.db.Queryx(query, args...)
 }
 
 func (q *QueryLogger) QueryRowx(query string, args ...interface{}) *sqlx.Row {
-	q.logger.Info().Str("query", query).Any("args", args).Msg("queryrowx")
+	q.logger.Info().Str("sql", logger.ExplainSQL(
+		query,
+		nil,
+		`'`,
+		args...,
+	)).Msg("queryrowx")
 	return q.db.QueryRowx(query, args...)
 }

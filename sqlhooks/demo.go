@@ -46,7 +46,7 @@ func Run() {
 		}
 		list = append(list, t)
 	}
-	log.Info().Any("list", list).Msg("list1")
+	log.Info().Any("list", list).Msg("queryx")
 
 	// 查询
 	list2 := make([]*types.Table, 0)
@@ -54,7 +54,7 @@ func Run() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to query")
 	}
-	log.Info().Any("list", list2).Msg("list2")
+	log.Info().Any("list", list2).Msg("select")
 }
 
 var _ sqlhooks.Hooks = (*Hooks)(nil)
@@ -73,7 +73,7 @@ func (h *Hooks) After(ctx context.Context, query string, args ...interface{}) (c
 	//log.Info().Str("query", query).Any("args", args).Dur("elapsed", time.Since(begin)).Msg("after query")
 	log.Debug().
 		Str("query",
-			logger.ExplainSQL(query, nil, `"`, args...),
+			logger.ExplainSQL(query, nil, `'`, args...),
 		).
 		Str("elapsed", time.Since(begin).String()).
 		Msg("after query")
